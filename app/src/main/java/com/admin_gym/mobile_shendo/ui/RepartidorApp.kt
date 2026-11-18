@@ -122,8 +122,10 @@ private fun DisponiblesScreen(vm: MainViewModel) {
                                 style = MaterialTheme.typography.titleMedium,
                                 color = Organic.text,
                             )
-                            vm.estadoRepartidor?.vehiculo?.takeIf { it.isNotBlank() }?.let {
-                                Text("Vehículo: $it", style = MaterialTheme.typography.bodySmall, color = Organic.textMuted)
+                            vm.estadoRepartidor?.let { e ->
+                                listOfNotNull(e.vehiculo.ifBlank { null }, e.patente.ifBlank { null })
+                                    .takeIf { it.isNotEmpty() }
+                                    ?.let { Text(it.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = Organic.textMuted) }
                             }
                         }
                         Switch(

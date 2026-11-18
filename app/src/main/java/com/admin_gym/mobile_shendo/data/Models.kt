@@ -15,6 +15,7 @@ data class Session(
 /** Datos de la cuenta de repartidor (GET/PATCH /api/repartidor/estado/). */
 data class EstadoRepartidor(
     val vehiculo: String,
+    val patente: String,
     val disponible: Boolean,
 )
 

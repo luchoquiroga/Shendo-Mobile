@@ -53,6 +53,7 @@ fun PerfilScreen(vm: MainViewModel) {
     var claveNueva by rememberSaveable { mutableStateOf("") }
     var editandoVehiculo by rememberSaveable { mutableStateOf(false) }
     var vehiculoEd by rememberSaveable { mutableStateOf("") }
+    var patenteEd by rememberSaveable { mutableStateOf("") }
 
     Column(Modifier.fillMaxSize()) {
         Encabezado("Tu perfil")
@@ -128,12 +129,20 @@ fun PerfilScreen(vm: MainViewModel) {
                     Text("Repartidor", style = MaterialTheme.typography.titleSmall, color = Organic.text)
                     Spacer(Modifier.height(Organic.space2))
                     if (editandoVehiculo) {
-                        CampoTexto(vehiculoEd, { vehiculoEd = it }, "Vehículo (ej. moto, bici)", imeAction = ImeAction.Done)
+                        CampoTexto(vehiculoEd, { vehiculoEd = it }, "Vehículo (ej. moto, bici)")
+                        Spacer(Modifier.height(12.dp))
+                        CampoTexto(
+                            patenteEd,
+                            { patenteEd = it },
+                            "Patente (opcional)",
+                            imeAction = ImeAction.Done,
+                            mayusculas = true,
+                        )
                         Row(Modifier.align(Alignment.End)) {
                             TextButton(onClick = { editandoVehiculo = false }) { Text("Cancelar", color = Organic.accent800) }
                             TextButton(
                                 enabled = vehiculoEd.isNotBlank(),
-                                onClick = { vm.cambiarVehiculo(vehiculoEd); editandoVehiculo = false },
+                                onClick = { vm.cambiarVehiculo(vehiculoEd, patenteEd); editandoVehiculo = false },
                             ) { Text("Guardar", color = Organic.accent800) }
                         }
                     } else {
@@ -145,9 +154,21 @@ fun PerfilScreen(vm: MainViewModel) {
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Organic.text,
                                 )
+                                Text(
+                                    "Patente",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Organic.textMuted,
+                                    modifier = Modifier.padding(top = Organic.space2),
+                                )
+                                Text(
+                                    vm.estadoRepartidor?.patente?.ifBlank { null } ?: "—",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Organic.text,
+                                )
                             }
                             TextButton(onClick = {
                                 vehiculoEd = vm.estadoRepartidor?.vehiculo.orEmpty()
+                                patenteEd = vm.estadoRepartidor?.patente.orEmpty()
                                 editandoVehiculo = true
                             }) { Text("Editar", color = Organic.accent800) }
                         }

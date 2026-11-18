@@ -45,9 +45,13 @@ fun AuthScreen(vm: MainViewModel) {
 
     var repartidor by rememberSaveable { mutableStateOf(false) }
     var vehiculo by rememberSaveable { mutableStateOf("") }
+    var patente by rememberSaveable { mutableStateOf("") }
 
     val enviar = {
-        if (registrando) vm.registro(nombre, email, telefono, contrasena, direccion, if (repartidor) vehiculo else null)
+        if (registrando) {
+            if (repartidor) vm.registro(nombre, email, telefono, contrasena, direccion, vehiculo, patente)
+            else vm.registro(nombre, email, telefono, contrasena, direccion)
+        }
         else vm.login(email, contrasena)
     }
 
@@ -123,6 +127,13 @@ fun AuthScreen(vm: MainViewModel) {
                         valor = vehiculo,
                         onChange = { vehiculo = it },
                         label = "Vehículo (ej. moto, bici)",
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    CampoTexto(
+                        valor = patente,
+                        onChange = { patente = it },
+                        label = "Patente (opcional)",
+                        mayusculas = true,
                         imeAction = ImeAction.Done,
                         onDone = { enviar() },
                     )

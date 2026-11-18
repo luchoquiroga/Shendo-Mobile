@@ -38,6 +38,9 @@ data class CambioDeRestaurante(
     val producto: Producto,
 )
 
+/** Mismo límite que valida el back (repartidor.patente varchar(15)). */
+const val MAX_PATENTE = 15
+
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val store = SessionStore(app)
@@ -134,6 +137,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         contrasena: String,
         direccion: String,
         vehiculo: String? = null,
+        patente: String = "",
     ) {
         val digitos = telefono.count { it.isDigit() }
         authError = when {
@@ -143,11 +147,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             digitos !in 6..15 -> "El teléfono no es válido"
             contrasena.length < 6 -> "La contraseña debe tener al menos 6 caracteres"
             vehiculo != null && vehiculo.isBlank() -> "Contanos en qué vehículo repartís"
+            patente.trim().length > MAX_PATENTE -> "La patente puede tener hasta $MAX_PATENTE caracteres"
             else -> null
         }
         if (authError != null) return
         autenticar {
-            ApiClient.registro(nombre.trim(), email.trim(), telefono.trim(), contrasena, direccion.trim(), vehiculo?.trim())
+            ApiClient.registro(
+                nombre.trim(), email.trim(), telefono.trim(), contrasena, direccion.trim(), vehiculo?.trim(),
+                patente.trim().uppercase(),
+            )
         }
     }
 
@@ -307,10 +315,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun cambiarVehiculo(vehiculo: String) {
+    /** Vehículo y patente juntos; la patente es opcional (vacía la borra). */
+    fun cambiarVehiculo(vehiculo: String, patente: String) {
         if (vehiculo.isBlank()) { mensaje = "Ingresá tu vehículo"; return }
+        if (patente.trim().length > MAX_PATENTE) { mensaje = "La patente puede tener hasta $MAX_PATENTE caracteres"; return }
         accionRepartidor(null) { token ->
-            estadoRepartidor = ApiClient.actualizarEstadoRepartidor(token, vehiculo = vehiculo.trim())
+            estadoRepartidor = ApiClient.actualizarEstadoRepartidor(token, vehiculo = vehiculo.trim(), patente = patente.trim().uppercase())
             mensaje = "Vehículo actualizado"
         }
     }

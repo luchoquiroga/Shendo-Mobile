@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -182,6 +183,8 @@ fun CampoTexto(
     imeAction: ImeAction = ImeAction.Next,
     onDone: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    // Pide mayúsculas al teclado: transformar el texto en onChange pierde letras mientras el IME compone.
+    mayusculas: Boolean = false,
 ) {
     OutlinedTextField(
         value = valor,
@@ -190,7 +193,11 @@ fun CampoTexto(
         singleLine = true,
         shape = Organic.radiusMd,
         visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(keyboardType = teclado, imeAction = imeAction),
+        keyboardOptions = KeyboardOptions(
+            capitalization = if (mayusculas) KeyboardCapitalization.Characters else KeyboardCapitalization.Unspecified,
+            keyboardType = teclado,
+            imeAction = imeAction,
+        ),
         keyboardActions = KeyboardActions(onDone = { onDone?.invoke() }),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Organic.surface,

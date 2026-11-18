@@ -66,6 +66,7 @@ object ApiClient {
         contrasena: String,
         direccion: String,
         vehiculo: String? = null,
+        patente: String = "",
     ): Session {
         val body = JSONObject()
             .put("nombre", nombre)
@@ -73,7 +74,7 @@ object ApiClient {
             .put("telefono", telefono)
             .put("contrasena", contrasena)
             .put("direccion", direccion)
-            .apply { if (vehiculo != null) put("repartidor", true).put("vehiculo", vehiculo) }
+            .apply { if (vehiculo != null) put("repartidor", true).put("vehiculo", vehiculo).put("patente", patente) }
         return sesion(JSONObject(request("POST", "cliente/registro/", body = body)))
     }
 
@@ -167,10 +168,17 @@ object ApiClient {
     suspend fun getEstadoRepartidor(token: String): EstadoRepartidor =
         estadoRepartidor(JSONObject(request("GET", "repartidor/estado/", token)))
 
-    suspend fun actualizarEstadoRepartidor(token: String, disponible: Boolean? = null, vehiculo: String? = null): EstadoRepartidor {
+    /** [patente] vacía la borra. */
+    suspend fun actualizarEstadoRepartidor(
+        token: String,
+        disponible: Boolean? = null,
+        vehiculo: String? = null,
+        patente: String? = null,
+    ): EstadoRepartidor {
         val body = JSONObject().apply {
             disponible?.let { put("disponible", it) }
             vehiculo?.let { put("vehiculo", it) }
+            patente?.let { put("patente", it) }
         }
         return estadoRepartidor(JSONObject(request("PATCH", "repartidor/estado/", token, body)))
     }
@@ -209,6 +217,7 @@ object ApiClient {
 
     private fun estadoRepartidor(json: JSONObject) = EstadoRepartidor(
         vehiculo = json.str("vehiculo").orEmpty(),
+        patente = json.str("patente").orEmpty(),
         disponible = json.optBoolean("disponible", false),
     )
 
